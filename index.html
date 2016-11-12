@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>网站技术构成</title>
+
+    <style>
+        body {
+            position: fixed;
+
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+
+            background-color: #131322;
+
+            font-size: 12px;
+
+            margin: 0;
+        }
+
+        .four {
+            width: 50%;
+            height: 50%;
+            float: left;
+            text-align: center;
+            box-shadow: inset 0 0 120px #ffffff;
+            vertical-align: middle;
+
+            font-size: 6rem;
+        }
+        
+        @media (max-device-width: 800px) {
+            .four {
+                width: 100%;
+                height: 25%;
+
+                font-size: 4rem;
+            }
+        }
+
+        @media (max-device-width: 400px) {
+            .four {
+                font-size: 3rem;
+            }
+        }
+
+        .four:after {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            width: 0;
+            vertical-align: middle;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="four">PageSlider</div>
+<div class="four">Three.js</div>
+<div class="four">D3</div>
+<div class="four">Gulp</div>
+
+<script>
+    var nodeList = document.getElementsByClassName('four');
+    for (var i = 0; i < nodeList.length; i++) {
+        var node = nodeList[i];
+
+        var number = ~~(Math.random() * (1 << 24));
+        var s = number.toString(16);
+
+        node.style.backgroundColor = '#' + '000000'.substring(s.length) + s;
+        node.style.color = number > (1 << 23) ? '#000000' : '#ffffff';
+    }
+</script>
+</body>
+</html>
