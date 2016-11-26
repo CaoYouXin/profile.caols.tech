@@ -94,6 +94,49 @@
         #tongji a:last-child {
             border-top-right-radius: 10px;
         }
+
+        .fixed-box {
+            position: fixed;
+            z-index: 10;
+
+            width: 100%;
+            height: 100%;
+
+            text-align: center;
+
+            display: none;
+        }
+
+        .fixed-box.text {
+            display: inline-block;
+
+            box-shadow: inset 0 0 120px #ffffff;
+
+            vertical-align: middle;
+            font-size: 6rem;
+
+            transition: transform 1s;
+        }
+
+        .fixed-box.text:after {
+            content: '';
+            display: inline-block;
+
+            width: 0;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        .fixed-box svg {
+            transform-origin: 50% 0 0;
+            transition: transform 1s;
+
+            transition-timing-function: cubic-bezier(.72,-1.5,.38,1);
+        }
+
+        .z9 {
+            z-index: 9 !important;
+        }
     </style>
 
 </head>
@@ -104,8 +147,179 @@
 <div class="four">D3</div>
 <div class="four">Gulp</div>
 
+<div class="fixed-box">
+    <div></div>
+    <svg width="200" height="400" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#ff0" fill-opacity="0.9" stroke="#ff1" stroke-width="0.5" stroke-linejoin="undefined" stroke-linecap="undefined" stroke-opacity="0.8" d="m0,205l200,-10l-140,205l80,-400l-140,205"/>
+    </svg>
+</div>
+
+<script id="polyfill">
+    // Production steps of ECMA-262, Edition 5, 15.4.4.18
+    // Reference: http://es5.github.io/#x15.4.4.18
+    if (!Array.prototype.forEach) {
+
+        Array.prototype.forEach = function(callback, thisArg) {
+
+            var T, k;
+
+            if (this === null) {
+                throw new TypeError(' this is null or not defined');
+            }
+
+            // 1. Let O be the result of calling toObject() passing the
+            // |this| value as the argument.
+            var O = Object(this);
+
+            // 2. Let lenValue be the result of calling the Get() internal
+            // method of O with the argument "length".
+            // 3. Let len be toUint32(lenValue).
+            var len = O.length >>> 0;
+
+            // 4. If isCallable(callback) is false, throw a TypeError exception.
+            // See: http://es5.github.com/#x9.11
+            if (typeof callback !== "function") {
+                throw new TypeError(callback + ' is not a function');
+            }
+
+            // 5. If thisArg was supplied, let T be thisArg; else let
+            // T be undefined.
+            if (arguments.length > 1) {
+                T = thisArg;
+            }
+
+            // 6. Let k be 0
+            k = 0;
+
+            // 7. Repeat, while k < len
+            while (k < len) {
+
+                var kValue;
+
+                // a. Let Pk be ToString(k).
+                //    This is implicit for LHS operands of the in operator
+                // b. Let kPresent be the result of calling the HasProperty
+                //    internal method of O with argument Pk.
+                //    This step can be combined with c
+                // c. If kPresent is true, then
+                if (k in O) {
+
+                    // i. Let kValue be the result of calling the Get internal
+                    // method of O with argument Pk.
+                    kValue = O[k];
+
+                    // ii. Call the Call internal method of callback with T as
+                    // the this value and argument list containing kValue, k, and O.
+                    callback.call(T, kValue, k, O);
+                }
+                // d. Increase k by 1.
+                k++;
+            }
+            // 8. return undefined
+        };
+    }
+
+    // Production steps of ECMA-262, Edition 6, 22.1.2.1
+    if (!Array.from) {
+        Array.from = (function () {
+            var toStr = Object.prototype.toString;
+            var isCallable = function (fn) {
+                return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+            };
+            var toInteger = function (value) {
+                var number = Number(value);
+                if (isNaN(number)) { return 0; }
+                if (number === 0 || !isFinite(number)) { return number; }
+                return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+            };
+            var maxSafeInteger = Math.pow(2, 53) - 1;
+            var toLength = function (value) {
+                var len = toInteger(value);
+                return Math.min(Math.max(len, 0), maxSafeInteger);
+            };
+
+            // The length property of the from method is 1.
+            return function from(arrayLike/*, mapFn, thisArg */) {
+                // 1. Let C be the this value.
+                var C = this;
+
+                // 2. Let items be ToObject(arrayLike).
+                var items = Object(arrayLike);
+
+                // 3. ReturnIfAbrupt(items).
+                if (arrayLike == null) {
+                    throw new TypeError("Array.from requires an array-like object - not null or undefined");
+                }
+
+                // 4. If mapfn is undefined, then let mapping be false.
+                var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+                var T;
+                if (typeof mapFn !== 'undefined') {
+                    // 5. else
+                    // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+                    if (!isCallable(mapFn)) {
+                        throw new TypeError('Array.from: when provided, the second argument must be a function');
+                    }
+
+                    // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+                    if (arguments.length > 2) {
+                        T = arguments[2];
+                    }
+                }
+
+                // 10. Let lenValue be Get(items, "length").
+                // 11. Let len be ToLength(lenValue).
+                var len = toLength(items.length);
+
+                // 13. If IsConstructor(C) is true, then
+                // 13. a. Let A be the result of calling the [[Construct]] internal method
+                // of C with an argument list containing the single item len.
+                // 14. a. Else, Let A be ArrayCreate(len).
+                var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+
+                // 16. Let k be 0.
+                var k = 0;
+                // 17. Repeat, while k < len… (also steps a - h)
+                var kValue;
+                while (k < len) {
+                    kValue = items[k];
+                    if (mapFn) {
+                        A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+                    } else {
+                        A[k] = kValue;
+                    }
+                    k += 1;
+                }
+                // 18. Let putStatus be Put(A, "length", len, true).
+                A.length = len;
+                // 20. Return A.
+                return A;
+            };
+        }());
+    }
+</script>
+
 <script>
+    var z9 = document.getElementsByClassName('z9')[0];
+    function create(svg, node, left, text) {
+        var cloneNode = svg.parentElement.cloneNode(false);
+        cloneNode.classList.add('text');
+        cloneNode.classList.add('z9');
+        cloneNode.innerHTML = text || node.innerHTML;
+
+        cloneNode.style.backgroundColor = node.style.backgroundColor;
+        cloneNode.style.color = node.style.color;
+
+        document.body.appendChild(cloneNode);
+        cloneNode.style.transformOrigin = (left ? '0' : '100%') + ' 50% 0';
+
+        setTimeout(function () {
+            cloneNode.style.transform = 'scaleX(0.5)';
+        }, 0);
+    }
+
     var nodeList = document.getElementsByClassName('four'), active = true;
+    var svg = document.querySelector('.fixed-box svg');
     for (var i = 0; i < nodeList.length; i++) {
         var node = nodeList[i];
 
@@ -131,6 +345,15 @@
                 self.style.zIndex = '2';
                 setTimeout(function () {
                     active = true;
+
+                    if (self.innerHTML === 'PageSlider') {
+                        svg.parentElement.style.display = 'block';
+                        svg.style.transform = 'scaleY('+(svg.parentElement.clientHeight / svg.clientHeight)+')';
+
+                        create(svg, self, true);
+                        create(svg, self, false, 'Router');
+                    }
+
                 }, 1000);
             } else {
                 setTimeout(function () {
@@ -140,6 +363,14 @@
             }
         };
     }
+
+    svg.onclick = function () {
+        svg.parentElement.style.display = 'none';
+
+        Array.from(document.getElementsByClassName('z9')).forEach(function (z9) {
+            z9.remove();
+        });
+    };
 </script>
 
 <div id="tongji">
