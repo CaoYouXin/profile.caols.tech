@@ -28,7 +28,28 @@
             box-shadow: inset 0 0 120px #ffffff;
             vertical-align: middle;
 
+            cursor: pointer;
+
             font-size: 6rem;
+            position: relative;
+
+            transition: transform 1s;
+        }
+
+        .four:nth-child(1) {
+            transform-origin: 0 0 0;
+        }
+
+        .four:nth-child(2) {
+            transform-origin: 100% 0 0;
+        }
+
+        .four:nth-child(3) {
+            transform-origin: 0 100% 0;
+        }
+
+        .four:nth-child(4) {
+            transform-origin: 100% 100% 0;
         }
         
         @media (max-device-width: 800px) {
@@ -64,7 +85,7 @@
 <div class="four">Gulp</div>
 
 <script>
-    var nodeList = document.getElementsByClassName('four');
+    var nodeList = document.getElementsByClassName('four'), active = true;
     for (var i = 0; i < nodeList.length; i++) {
         var node = nodeList[i];
 
@@ -73,6 +94,31 @@
 
         node.style.backgroundColor = '#' + '000000'.substring(s.length) + s;
         node.style.color = number > (1 << 23) ? '#000000' : '#ffffff';
+
+        node.onclick = function () {
+            if (!active) {
+                return false;
+            }
+            active = false;
+
+            var self = this;
+
+            var transform = this.style.transform || 'scale(1)';
+            var value = transform.match(/scale\((\d+)\)/)[1];
+            self.style.transform = 'scale('+(value === '1' ? '2' : '1')+')';
+
+            if (value === '1') {
+                self.style.zIndex = '2';
+                setTimeout(function () {
+                    active = true;
+                }, 1000);
+            } else {
+                setTimeout(function () {
+                    active = true;
+                    self.style.zIndex = '1';
+                }, 1000);
+            }
+        };
     }
 </script>
 </body>
