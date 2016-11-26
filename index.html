@@ -366,6 +366,7 @@
 
     svg.onclick = function () {
         svg.parentElement.style.display = 'none';
+        svg.style.transform = 'scaleY(1)';
 
         Array.from(document.getElementsByClassName('z9')).forEach(function (z9) {
             z9.remove();
