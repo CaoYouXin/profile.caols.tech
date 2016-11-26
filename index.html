@@ -59,6 +59,22 @@
 
                 font-size: 4rem;
             }
+
+            .four:nth-child(1) {
+                transform-origin: 50% 0 0;
+            }
+
+            .four:nth-child(2) {
+                transform-origin: 50% 33.33333% 0;
+            }
+
+            .four:nth-child(3) {
+                transform-origin: 50% 66.6666% 0;
+            }
+
+            .four:nth-child(4) {
+                transform-origin: 50% 100% 0;
+            }
         }
 
         @media (max-device-width: 400px) {
@@ -335,11 +351,17 @@
             }
             active = false;
 
-            var self = this;
+            var self = this, transform, value;
 
-            var transform = this.style.transform || 'scale(1)';
-            var value = transform.match(/scale\((\d+)\)/)[1];
-            self.style.transform = 'scale('+(value === '1' ? '2' : '1')+')';
+            if (self.clientWidth === document.body.clientWidth) {
+                transform = self.style.transform || 'scaleY(1)';
+                value = transform.match(/scaleY\((\d+)\)/)[1];
+                self.style.transform = 'scaleY('+(value === '1' ? '4' : '1')+')';
+            } else {
+                transform = self.style.transform || 'scale(1)';
+                value = transform.match(/scale\((\d+)\)/)[1];
+                self.style.transform = 'scale('+(value === '1' ? '2' : '1')+')';
+            }
 
             if (value === '1') {
                 self.style.zIndex = '2';
